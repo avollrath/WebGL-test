@@ -1,109 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
-	<title>Jurassic Jump</title>
-	<style>
-		html, body {
-			margin: 0;
-			padding: 0;
-			background-color: black;
-			color: white;
-			overflow: hidden;
-			touch-action: none;
-		}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+  <title>Jurassic Jump</title>
+  <style>
+    html, body {
+      margin: 0; 
+      padding: 0;
+      background-color: black;
+      color: white;
+      overflow: hidden;
+      touch-action: none;
+    }
 
-		#canvas {
-			display: block;
-			width: 100vw;
-			height: 100vh;
-		}
-		#canvas:focus {
-			outline: none;
-		}
+    /* The Godot canvas */
+    #canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+    #canvas:focus {
+      outline: none;
+    }
 
-		/* The intro text displayed while the engine loads */
-		#andre-intro {
-			position: fixed;
-			top: 0; left: 0; right: 0; bottom: 0;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			font-size: 2rem;
-			font-family: sans-serif;
-			color: white;
-			opacity: 1;
-			transition: opacity 1s ease-in-out; /* fade-out animation */
-			z-index: 9999; /* ensure it's above everything else */
-		}
-		/* When we add .fade-out, the intro goes to opacity: 0 */
-		#andre-intro.fade-out {
-			opacity: 0;
-		}
-	</style>
-	<!-- Engine icons (favicon, apple-touch-icon). Remove or adjust as needed. -->
-	<link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png"/>
-	<link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
+    /* The simple intro text */
+    #andre-intro {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      font-family: sans-serif;
+      color: white;
+      opacity: 1;
+      transition: opacity 1s ease-in-out; /* fade-out animation */
+      z-index: 9999; /* ensure on top of everything */
+    }
+    /* Fades out once we add the .fade-out class */
+    #andre-intro.fade-out {
+      opacity: 0;
+    }
+  </style>
+  <link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
+  <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
 </head>
 
 <body>
-	<!-- Our custom intro text while WASM loads -->
-	<div id="andre-intro">Andre presents</div>
+  <!-- Our custom intro text while WASM loads -->
+  <div id="andre-intro">Andre presents</div>
 
-	<!-- The Godot canvas -->
-	<canvas id="canvas">Your browser does not support the canvas tag.</canvas>
-	<noscript>Your browser does not support JavaScript.</noscript>
+  <!-- The Godot canvas -->
+  <canvas id="canvas">Your browser does not support the canvas tag.</canvas>
+  <noscript>Your browser does not support JavaScript.</noscript>
 
-	<!-- Load the Godot engine (exported by Godot). -->
-	<script src="index.js"></script>
-	<script>
-		// Basic config from Godot
-		const GODOT_CONFIG = {
-			"args": [],
-			"canvasResizePolicy": 2,
-			"ensureCrossOriginIsolationHeaders": true,
-			"executable": "index",
-			"experimentalVK": false,
-			"fileSizes": {
-				"index.pck": 43186080,
-				"index.wasm": 43016933
-			},
-			"focusCanvas": true,
-			"gdextensionLibs": []
-		};
+  <!-- Load the Godot engine (exported by Godot). -->
+  <script src="index.js"></script>
+  <script>
+    // Same GODOT_CONFIG from your export
+    const GODOT_CONFIG = {
+      "args": [],
+      "canvasResizePolicy": 2,
+      "ensureCrossOriginIsolationHeaders": true,
+      "executable": "index",
+      "experimentalVK": false,
+      "fileSizes": {"index.pck": 43186080,"index.wasm": 35376909},
+      "focusCanvas": true,
+      "gdextensionLibs": []
+    };
 
-		const GODOT_THREADS_ENABLED = false;
-		const engine = new Engine(GODOT_CONFIG);
+    const GODOT_THREADS_ENABLED = false;
+    const engine = new Engine(GODOT_CONFIG);
 
-		(function () {
-			const introDiv = document.getElementById('andre-intro');
+    (function () {
+      const introDiv = document.getElementById('andre-intro');
 
-			// Check if the browser lacks features Godot needs
-			const missing = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
-			if (missing.length !== 0) {
-				// Optionally show an error to the user, or fallback
-				console.error("Missing features:", missing);
-				// For simplicity, just remove the intro & do nothing else
-				introDiv.textContent = "Sorry, your browser is missing required features.";
-				return;
-			}
+      // Check for missing features
+      const missing = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
+      if (missing.length !== 0) {
+        console.error("Missing features:", missing);
+        introDiv.textContent = "Sorry, your browser is missing required features.";
+        return;
+      }
 
-			// Start the Godot engine (downloads .wasm, .pck, etc.)
-			engine.startGame({})
-				.then(() => {
-					// Once loaded, fade out the “Andre presents” text
-					introDiv.classList.add('fade-out');
-					// Remove the element from the DOM after animation
-					setTimeout(() => {
-						introDiv.remove();
-					}, 1000); // matches the 1s transition
-				})
-				.catch(err => {
-					console.error("Engine start failed:", err);
-					introDiv.textContent = "An error occurred while loading the game.";
-				});
-		})();
-	</script>
+      // Start the game. We skip the default progress overlay, 
+      // so no 'onProgress' usage. Or you can still track progress if you like.
+      engine.startGame({})
+        .then(() => {
+          // Fade out “Andre presents”
+          introDiv.classList.add('fade-out');
+          // Remove from DOM after fade-out completes
+          setTimeout(() => {
+            introDiv.remove();
+          }, 1000);
+        })
+        .catch(err => {
+          console.error("Engine start failed:", err);
+          introDiv.textContent = "An error occurred while loading the game.";
+        });
+    })();
+  </script>
 </body>
 </html>
