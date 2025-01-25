@@ -24,21 +24,25 @@
       outline: none;
     }
 
-    /* The simple intro text */
+    /* The intro text starts invisible (opacity: 0) */
     #andre-intro {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 2rem;
+      font-size: 5rem;
       font-family: sans-serif;
       color: white;
-      opacity: 1;
-      transition: opacity 1s ease-in-out; /* fade-out animation */
-      z-index: 9999; /* ensure on top of everything */
+      opacity: 0; /* Initially invisible */
+      transition: opacity 1s ease-in-out; /* We'll fade in & out using classes */
+      z-index: 9999;
     }
-    /* Fades out once we add the .fade-out class */
+    /* Fade in class */
+    #andre-intro.fade-in {
+      opacity: 1;
+    }
+    /* Fade out class */
     #andre-intro.fade-out {
       opacity: 0;
     }
@@ -49,7 +53,7 @@
 
 <body>
   <!-- Our custom intro text while WASM loads -->
-  <div id="andre-intro">Andre presents</div>
+  <div id="andre-intro">André Vollrath presents ...</div>
 
   <!-- The Godot canvas -->
   <canvas id="canvas">Your browser does not support the canvas tag.</canvas>
@@ -76,6 +80,11 @@
     (function () {
       const introDiv = document.getElementById('andre-intro');
 
+      // 1) Wait 1 second, then fade in the text
+      setTimeout(() => {
+        introDiv.classList.add('fade-in');
+      }, 300);
+
       // Check for missing features
       const missing = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
       if (missing.length !== 0) {
@@ -84,13 +93,14 @@
         return;
       }
 
-      // Start the game. We skip the default progress overlay, 
-      // so no 'onProgress' usage. Or you can still track progress if you like.
+      // 2) Start the engine (skip default progress overlay)
       engine.startGame({})
         .then(() => {
-          // Fade out “Andre presents”
+          // 3) Once engine finishes loading, fade out
+          introDiv.classList.remove('fade-in');
           introDiv.classList.add('fade-out');
-          // Remove from DOM after fade-out completes
+
+          // Remove the intro div after the fade-out completes (1s transition)
           setTimeout(() => {
             introDiv.remove();
           }, 1000);
