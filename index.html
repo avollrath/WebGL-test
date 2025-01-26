@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
   <title>Jurassic Jump</title>
   <style>
+   @import url('https://fonts.googleapis.com/css2?family=Gorditas:wght@400;700&display=swap');
+
+    /* Font classes */
+    .gorditas-regular {
+      font-family: "Gorditas", serif;
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    .gorditas-bold {
+      font-family: "Gorditas", serif;
+      font-weight: 700;
+      font-style: normal;
+    }
     html, body {
       margin: 0; 
       padding: 0;
@@ -35,7 +49,7 @@
       font-family: sans-serif;
       color: white;
       opacity: 0; /* Initially invisible */
-      transition: opacity 1s ease-in-out; /* We'll fade in & out using classes */
+      transition: opacity 0.5s ease-in-out; /* We'll fade in & out using classes */
       z-index: 9999;
     }
     /* Fade in class */
@@ -53,7 +67,7 @@
 
 <body>
   <!-- Our custom intro text while WASM loads -->
-  <div id="andre-intro">André Vollrath presents ...</div>
+  <div id="andre-intro" class="gorditas-bold">André Vollrath presents ...</div>
 
   <!-- The Godot canvas -->
   <canvas id="canvas">Your browser does not support the canvas tag.</canvas>
@@ -83,7 +97,7 @@
       // 1) Wait 1 second, then fade in the text
       setTimeout(() => {
         introDiv.classList.add('fade-in');
-      }, 300);
+      }, 1000);
 
       // Check for missing features
       const missing = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
@@ -103,7 +117,7 @@
           // Remove the intro div after the fade-out completes (1s transition)
           setTimeout(() => {
             introDiv.remove();
-          }, 300);
+          }, 600);
         })
         .catch(err => {
           console.error("Engine start failed:", err);
