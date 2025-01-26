@@ -1,129 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
-  <title>Jurassic Jump</title>
-  <style>
-   @import url('https://fonts.googleapis.com/css2?family=Gorditas:wght@400;700&display=swap');
-
-    /* Font classes */
-    .gorditas-regular {
-      font-family: "Gorditas", serif;
-      font-weight: 400;
-      font-style: normal;
-    }
-
-    .gorditas-bold {
-      font-family: "Gorditas", serif;
-      font-weight: 700;
-      font-style: normal;
-    }
-    html, body {
-      margin: 0; 
-      padding: 0;
-      background-color: black;
-      color: white;
-      overflow: hidden;
-      touch-action: none;
-    }
-
-    /* The Godot canvas */
-    #canvas {
-      display: block;
-      width: 100vw;
-      height: 100vh;
-    }
-    #canvas:focus {
-      outline: none;
-    }
-
-    /* The intro text starts invisible (opacity: 0) */
-    #andre-intro {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 5rem;
-      font-family: sans-serif;
-      color: white;
-      opacity: 0; /* Initially invisible */
-      transition: opacity 0.5s ease-in-out; /* We'll fade in & out using classes */
-      z-index: 9999;
-    }
-    /* Fade in class */
-    #andre-intro.fade-in {
-      opacity: 1;
-    }
-    /* Fade out class */
-    #andre-intro.fade-out {
-      opacity: 0;
-    }
-  </style>
-  <link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
-  <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
-</head>
-
-<body>
-  <!-- Our custom intro text while WASM loads -->
-  <div id="andre-intro" class="gorditas-bold">André Vollrath presents ...</div>
-
-  <!-- The Godot canvas -->
-  <canvas id="canvas">Your browser does not support the canvas tag.</canvas>
-  <noscript>Your browser does not support JavaScript.</noscript>
-
-  <!-- Load the Godot engine (exported by Godot). -->
-  <script src="index.js"></script>
-  <script>
-    // Same GODOT_CONFIG from your export
-    const GODOT_CONFIG = {
-      "args": [],
-      "canvasResizePolicy": 2,
-      "ensureCrossOriginIsolationHeaders": true,
-      "executable": "index",
-      "experimentalVK": false,
-      "fileSizes": {"index.pck": 43186080,"index.wasm": 35376909},
-      "focusCanvas": true,
-      "gdextensionLibs": []
-    };
-
-    const GODOT_THREADS_ENABLED = false;
-    const engine = new Engine(GODOT_CONFIG);
-
-    (function () {
-      const introDiv = document.getElementById('andre-intro');
-
-      // 1) Wait 1 second, then fade in the text
-      setTimeout(() => {
-        introDiv.classList.add('fade-in');
-      }, 1000);
-
-      // Check for missing features
-      const missing = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
-      if (missing.length !== 0) {
-        console.error("Missing features:", missing);
-        introDiv.textContent = "Sorry, your browser is missing required features.";
-        return;
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gorditas:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0"
+    />
+    <title>Jurassic Jump</title>
+    <style>
+      /* Font classes */
+      .gorditas-regular {
+        font-family: "Gorditas", serif;
+        font-weight: 400;
+        font-style: normal;
+        color: white;
       }
 
-      // 2) Start the engine (skip default progress overlay)
-      engine.startGame({})
-        .then(() => {
-          // 3) Once engine finishes loading, fade out
-          introDiv.classList.remove('fade-in');
-          introDiv.classList.add('fade-out');
+      .gorditas-bold {
+        font-family: "Gorditas", serif;
+        font-weight: 700;
+        font-style: normal;
+        color: white;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: black;
+        color: white;
+        overflow: hidden;
+        touch-action: none;
+      }
 
-          // Remove the intro div after the fade-out completes (1s transition)
-          setTimeout(() => {
-            introDiv.remove();
-          }, 600);
-        })
-        .catch(err => {
-          console.error("Engine start failed:", err);
-          introDiv.textContent = "An error occurred while loading the game.";
+      #canvas {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+      }
+      #canvas:focus {
+        outline: none;
+      }
+
+      #andre-intro {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 4rem;
+        color: white;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+        z-index: 9999;
+        gap: 5rem;
+      }
+
+      .logo {
+        width: 300px;
+      }
+      #andre-intro.fade-in {
+        opacity: 1;
+      }
+      #andre-intro.fade-out {
+        opacity: 0;
+      }
+    </style>
+    <link
+      id="-gd-engine-icon"
+      rel="icon"
+      type="image/png"
+      href="index.icon.png"
+    />
+    <link rel="apple-touch-icon" href="index.apple-touch-icon.png" />
+  </head>
+
+  <body>
+    <div id="andre-intro" class="gorditas-bold">
+      <img src="vollrath_logo.svg" class="logo" />
+      André Vollrath presents ...
+    </div>
+
+    <canvas id="canvas">Your browser does not support the canvas tag.</canvas>
+    <noscript>Your browser does not support JavaScript.</noscript>
+
+    <script src="index.js"></script>
+    <script>
+      const GODOT_CONFIG = {
+        args: [],
+        canvasResizePolicy: 2,
+        ensureCrossOriginIsolationHeaders: true,
+        executable: "index",
+        experimentalVK: false,
+        fileSizes: { "index.pck": 43186080, "index.wasm": 35376909 },
+        focusCanvas: true,
+        gdextensionLibs: [],
+      };
+
+      const GODOT_THREADS_ENABLED = false;
+      const engine = new Engine(GODOT_CONFIG);
+
+      (function () {
+        const introDiv = document.getElementById("andre-intro");
+
+        setTimeout(() => {
+          introDiv.classList.add("fade-in");
+        }, 1000);
+
+        const missing = Engine.getMissingFeatures({
+          threads: GODOT_THREADS_ENABLED,
         });
-    })();
-  </script>
-</body>
+        if (missing.length !== 0) {
+          console.error("Missing features:", missing);
+          introDiv.textContent =
+            "Sorry, your browser is missing required features.";
+          return;
+        }
+
+        engine
+          .startGame({})
+          .then(() => {
+            introDiv.classList.remove("fade-in");
+            introDiv.classList.add("fade-out");
+
+            setTimeout(() => {
+              introDiv.remove();
+            }, 600);
+          })
+          .catch((err) => {
+            console.error("Engine start failed:", err);
+            introDiv.textContent =
+              "Sorry...an error occurred while loading the game.";
+          });
+      })();
+    </script>
+  </body>
 </html>
